@@ -1,0 +1,46 @@
+name: movilar
+version: 1.0.0+1
+publish_to: none
+description: A new Flutter project.
+environment: 
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies: 
+  cupertino_icons: ^1.0.6
+  get: 4.6.6
+  flutter: 
+    sdk: flutter
+  flutter_native_splash: ^2.4.0
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^6.2.1
+  font_awesome_flutter: ^10.7.0
+  flutter_blue_plus: ^1.32.8
+  mqtt_client: ^10.2.1
+
+dev_dependencies: 
+  flutter_lints: 4.0.0
+  flutter_test: 
+    sdk: flutter
+
+flutter: 
+  uses-material-design: true
+
+  assets:
+      - assets/images/
+      - assets/icons/
+
+          
+flutter_native_splash:
+  color: '#242A32'
+  image: assets/images/splash.png
+  android: true
+  ios: true
+  web: false
+
+  android_12:
+    color: '#242A32'
+    icon_background_color: '#242A32'
+    image: assets/images/splash_12.png 
+
+
+  
