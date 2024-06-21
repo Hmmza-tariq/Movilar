@@ -61,7 +61,7 @@ class MqttView extends StatelessWidget {
             CustomElevatedButton(
                 onPressed: () async {
                   loadingWidget("Connecting to MQTT Broker");
-                  await controller.connect();
+                  controller.connect();
                   Get.back();
                 },
                 text: "Connect"),
@@ -74,7 +74,7 @@ class MqttView extends StatelessWidget {
                     return;
                   }
                   loadingWidget("Subscribing to Topic");
-                  controller.subscribe(controller.topicController.text);
+                  controller.subscribe();
                   Get.back();
                 },
                 text: "Subscribe"),
@@ -127,8 +127,8 @@ class MqttView extends StatelessWidget {
                     return;
                   }
                   loadingWidget("Publishing Message");
-                  controller.publishMessage(controller.topicController.text,
-                      controller.messageController.text);
+                  controller.publish();
+                  Get.back();
                 },
                 text: "Publish"),
             SizedBox(
@@ -157,7 +157,7 @@ class MqttView extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child:
                           StreamBuilder<List<MqttReceivedMessage<MqttMessage>>>(
-                        stream: controller.client.updates,
+                        stream: controller.client?.updates,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
