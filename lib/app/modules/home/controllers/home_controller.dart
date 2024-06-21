@@ -1,15 +1,19 @@
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
+import 'package:movilar/app/modules/mqtt/controllers/mqtt_listener.dart';
+import 'package:movilar/app/modules/mqtt/controllers/mqtt_publisher.dart';
 import 'package:movilar/app/resources/assets_manager.dart';
 
 class HomeController extends GetxController {
-  List<Movie> movies = [];
+  var movies = <Movie>[].obs;
   var selectedTabIndex = 0.obs;
+  var isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    movies = [
+    Get.put(MQTTListener());
+    movies.value = [
       Movie(
           title: "Spiderman No Way Home",
           about: "From DC Comics",
@@ -169,5 +173,12 @@ class HomeController extends GetxController {
   List<Movie> getWatchListMovies() {
     var result = movies.where((movie) => movie.isWatchListed!).toList();
     return result;
+  }
+
+  Future<void> fetchMovies() async {
+    isLoading.value = true;
+    await Future.delayed(const Duration(seconds: 2));
+    movies.value = movies.reversed.toList();
+    isLoading.value = false;
   }
 }

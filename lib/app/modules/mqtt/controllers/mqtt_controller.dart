@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/modules/mqtt/controllers/mqtt_manager.dart';
@@ -8,6 +9,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 class MqttController extends GetxController {
   var isConnected = false.obs;
   var isSubscribed = false.obs;
+  var internetConnected = false.obs;
   var message = <String>[].obs;
 
   final MQTTAppState currentState = Get.put(MQTTAppState());
@@ -22,7 +24,26 @@ class MqttController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    checkInternet();
     initializeMQTTClient();
+  }
+
+  @override
+  void onClose() {
+    disconnect();
+    super.onClose();
+  }
+
+  Future<void> checkInternet() async {
+    Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      if (result.contains(ConnectivityResult.none)) {
+        internetConnected.value = false;
+      } else {
+        internetConnected.value = true;
+      }
+    });
   }
 
   void initializeMQTTClient() {
@@ -47,7 +68,6 @@ class MqttController extends GetxController {
   }
 
   Future<void> connect() async {
-    loadingWidget("Connecting to server...");
     assert(client != null);
     try {
       currentState.setAppConnectionState(MQTTAppConnectionState.connecting);
@@ -70,7 +90,9 @@ class MqttController extends GetxController {
       });
       return;
     }
-    loadingWidget("Subscribing to Topic");
+
+    showLoadingWidget("Subscribing to Topic");
+
     client!.subscribe(topicController.text, MqttQos.atLeastOnce);
     isSubscribed.value = true;
     closeLoading();
@@ -84,7 +106,6 @@ class MqttController extends GetxController {
   }
 
   Future<void> publish() async {
-    // loadingWidget("Publishing Message...");
     final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
     builder.addString(messageController.text);
     client!.publishMessage(
@@ -92,20 +113,13 @@ class MqttController extends GetxController {
   }
 
   void onSubscribed(String topic) {
+    debugPrint('Subscribed client $topic');
     isSubscribed.value = true;
-    Get.snackbar("Success", "Subscribed to $topic",
-        colorText: Colors.white, backgroundColor: Colors.green);
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.closeAllSnackbars();
-    });
   }
 
   void onDisconnected() {
-    Get.snackbar("Disconnected", "Disconnected from server",
-        colorText: Colors.white, backgroundColor: Colors.red);
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.closeAllSnackbars();
-    });
+    debugPrint('Disconnected client');
+
     isSubscribed.value = false;
     isConnected.value = false;
     if (client!.connectionStatus!.returnCode ==
@@ -114,6 +128,7 @@ class MqttController extends GetxController {
   }
 
   void onConnected() {
+    debugPrint('Connected client');
     currentState.setAppConnectionState(MQTTAppConnectionState.connected);
     isConnected.value = true;
   }
@@ -122,11 +137,5 @@ class MqttController extends GetxController {
     isConnected.value = false;
     client!.disconnect();
     currentState.setAppConnectionState(MQTTAppConnectionState.disconnected);
-  }
-
-  @override
-  void onClose() {
-    disconnect();
-    super.onClose();
   }
 }

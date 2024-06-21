@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:movilar/app/resources/color_manager.dart';
 
-Future<dynamic> loadingWidget(String text) {
+Future<dynamic> showLoadingWidget(String text) {
   return Get.dialog(
     AlertDialog(
       backgroundColor: ColorManager.primary,
