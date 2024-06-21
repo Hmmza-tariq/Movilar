@@ -21,3 +21,12 @@ Future<dynamic> loadingWidget(String text) {
     ),
   );
 }
+
+void closeLoading() {
+  if (Get.isDialogOpen == true) {
+    Get.back();
+  }
+  if (Get.isSnackbarOpen) {
+    Get.closeAllSnackbars();
+  }
+}
