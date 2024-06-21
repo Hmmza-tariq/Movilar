@@ -16,6 +16,7 @@ dependencies:
   font_awesome_flutter: ^10.7.0
   flutter_blue_plus: ^1.32.8
   mqtt_client: ^10.2.1
+  permission_handler: ^11.3.1
 
 dev_dependencies: 
   flutter_lints: 4.0.0
