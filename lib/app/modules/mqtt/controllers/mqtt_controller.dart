@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/modules/mqtt/controllers/mqtt_manager.dart';
@@ -6,11 +8,11 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 
 class MqttController extends GetxController {
   var isConnected = false.obs;
-  var message = ''.obs;
+  var message = <String>[].obs;
 
   final MQTTAppState currentState = Get.put(MQTTAppState());
   MqttServerClient? client;
-  var identifier = "1234".obs;
+  var identifier = Random(1).toString();
   var host = "test.mosquitto.org".obs;
 
   TextEditingController messageController = TextEditingController();
@@ -23,7 +25,7 @@ class MqttController extends GetxController {
   }
 
   void initializeMQTTClient() {
-    client = MqttServerClient(host.value, identifier.value);
+    client = MqttServerClient(host.value, identifier);
     client!.port = 1883;
     client!.keepAlivePeriod = 20;
     client!.onDisconnected = onDisconnected;
@@ -35,7 +37,7 @@ class MqttController extends GetxController {
     client!.onSubscribed = onSubscribed;
 
     final MqttConnectMessage connMess = MqttConnectMessage()
-        .withClientIdentifier(identifier.value)
+        .withClientIdentifier(identifier)
         .withWillTopic(
             'willtopic') // If you set this you must set a will message
         .withWillMessage('My Will message')
@@ -98,6 +100,7 @@ class MqttController extends GetxController {
       final String pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       currentState.setReceivedText(pt);
+      message.add("Received message: $pt from topic: ${c[0].topic}>");
       print(
           'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
       print('');
