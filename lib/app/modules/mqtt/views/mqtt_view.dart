@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:movilar/app/modules/widgets/custom_app_bar.dart';
 import 'package:movilar/app/modules/widgets/custom_elevated_button.dart';
+import 'package:movilar/app/modules/widgets/loading.dart';
 import 'package:movilar/app/resources/color_manager.dart';
-
+import 'package:mqtt_client/mqtt_client.dart';
 import '../controllers/mqtt_controller.dart';
 
 class MqttView extends StatelessWidget {
   const MqttView({super.key});
+
   @override
   Widget build(BuildContext context) {
     MqttController controller = Get.put(MqttController());
     return Scaffold(
       appBar: customAppBar("MQTT"),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Column(
           children: [
             SizedBox(
@@ -57,13 +59,23 @@ class MqttView extends StatelessWidget {
               ),
             ),
             CustomElevatedButton(
-                onPressed: () {
-                  controller.connect();
+                onPressed: () async {
+                  loadingWidget("Connecting to MQTT Broker");
+                  await controller.connect();
+                  Get.back();
                 },
                 text: "Connect"),
             CustomElevatedButton(
                 onPressed: () {
+                  if (controller.topicController.text.isEmpty) {
+                    Get.snackbar("Error", "Please add topic to subscribe to",
+                        colorText: ColorManager.white,
+                        backgroundColor: ColorManager.red);
+                    return;
+                  }
+                  loadingWidget("Subscribing to Topic");
                   controller.subscribe(controller.topicController.text);
+                  Get.back();
                 },
                 text: "Subscribe"),
             SizedBox(
@@ -107,6 +119,14 @@ class MqttView extends StatelessWidget {
             ),
             CustomElevatedButton(
                 onPressed: () {
+                  if (controller.messageController.text.isEmpty ||
+                      controller.topicController.text.isEmpty) {
+                    Get.snackbar("Error", "Please fill all fields",
+                        colorText: ColorManager.white,
+                        backgroundColor: ColorManager.red);
+                    return;
+                  }
+                  loadingWidget("Publishing Message");
                   controller.publishMessage(controller.topicController.text,
                       controller.messageController.text);
                 },
@@ -131,17 +151,31 @@ class MqttView extends StatelessWidget {
                   SizedBox(
                     height: Get.height * 0.02,
                   ),
-                  Obx(() => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(controller.message.value,
-                            maxLines: 10,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontFamily: 'Montserrat',
-                                color: ColorManager.blue,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600)),
-                      )),
+                  SizedBox(
+                    height: Get.height,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child:
+                          StreamBuilder<List<MqttReceivedMessage<MqttMessage>>>(
+                        stream: controller.client.updates,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const CircularProgressIndicator();
+                          }
+                          return Center(
+                            child: Text(snapshot.data!.last.payload.toString(),
+                                maxLines: 10,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: ColorManager.blue,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600)),
+                          );
+                        },
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

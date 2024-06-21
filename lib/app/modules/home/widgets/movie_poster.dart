@@ -35,8 +35,8 @@ class MoviePoster extends StatelessWidget {
           bottom: 0,
           left: 0,
           child: Container(
-            width: 50,
-            height: 120,
+            width: index > 8 ? 100 : 60,
+            height: 140,
             decoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(8),

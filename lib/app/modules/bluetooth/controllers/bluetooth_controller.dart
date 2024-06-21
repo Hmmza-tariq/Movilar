@@ -22,7 +22,12 @@ class BluetoothController extends GetxController {
   }
 
   Future<List<BluetoothDevice>> getConnectedDevices() {
-    return FlutterBluePlus.bondedDevices;
+    var devices = FlutterBluePlus.bondedDevices.then((value) {
+      connectedDevices.addAll(value);
+      return value;
+    });
+
+    return devices;
   }
 
   void turnON() async {
