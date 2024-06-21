@@ -4,7 +4,6 @@ import 'package:movilar/app/modules/widgets/custom_app_bar.dart';
 import 'package:movilar/app/modules/widgets/custom_elevated_button.dart';
 import 'package:movilar/app/modules/widgets/loading.dart';
 import 'package:movilar/app/resources/color_manager.dart';
-import 'package:mqtt_client/mqtt_client.dart';
 import '../controllers/mqtt_controller.dart';
 
 class MqttView extends StatelessWidget {
@@ -155,25 +154,21 @@ class MqttView extends StatelessWidget {
                     height: Get.height,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child:
-                          StreamBuilder<List<MqttReceivedMessage<MqttMessage>>>(
-                        stream: controller.client?.updates,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const CircularProgressIndicator();
-                          }
-                          return Center(
-                            child: Text(snapshot.data!.last.payload.toString(),
-                                maxLines: 10,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    color: ColorManager.blue,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600)),
-                          );
-                        },
-                      ),
+                      child: Obx(() => ListView.builder(
+                            itemCount: controller.message.length,
+                            itemBuilder: (context, index) {
+                              return Center(
+                                child: Text(controller.message[index],
+                                    maxLines: 10,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        color: ColorManager.blue,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600)),
+                              );
+                            },
+                          )),
                     ),
                   )
                 ],
