@@ -24,7 +24,7 @@ class MQTTPublisher extends GetxController {
   void initializeMQTTClient() {
     client = MqttServerClient(host.value, identifier);
     client!.port = 1883;
-    client!.keepAlivePeriod = 20000;
+    client!.keepAlivePeriod = 20;
     client!.onDisconnected = onDisconnected;
     client!.secure = false;
     client!.logging(on: true);

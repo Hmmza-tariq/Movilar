@@ -14,7 +14,7 @@ class MqttController extends GetxController {
 
   final MQTTAppState currentState = Get.put(MQTTAppState());
   MqttServerClient? client;
-  var identifier = "android".toString();
+  var identifier = "huwaie".toString();
   var host = "test.mosquitto.org".obs;
 
   TextEditingController messageController = TextEditingController();
