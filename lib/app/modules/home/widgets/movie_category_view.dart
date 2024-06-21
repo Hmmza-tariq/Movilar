@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
+import 'package:movilar/app/modules/widgets/custom_image.dart';
 import 'package:movilar/app/resources/color_manager.dart';
 import 'package:movilar/app/routes/app_pages.dart';
 
@@ -32,9 +33,10 @@ class MovieCategoryView extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    movies[index].image,
-                    fit: BoxFit.cover,
+                  child: CustomImage(
+                    image: movies[index].image,
+                    width: 140,
+                    height: 210,
                   ),
                 ),
               ),

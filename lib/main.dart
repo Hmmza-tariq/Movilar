@@ -15,13 +15,35 @@ void main() {
     statusBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
   ));
-  runApp(
-    GetMaterialApp(
-      title: "Movilar",
-      initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
-      debugShowCheckedModeBanner: false,
-      theme: getApplicationTheme(),
-    ),
-  );
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((_) {
+    runApp(
+      GetMaterialApp(
+        title: "Movilar",
+        initialRoute: AppPages.INITIAL,
+        getPages: AppPages.routes,
+        debugShowCheckedModeBanner: false,
+        theme: getApplicationTheme(),
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(1.0)),
+            child: child!,
+          );
+        },
+      ),
+    );
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      return Container(
+        color: Colors.white,
+        child: const Center(
+          child: Text(
+            'Error',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
+      );
+    };
+  });
 }

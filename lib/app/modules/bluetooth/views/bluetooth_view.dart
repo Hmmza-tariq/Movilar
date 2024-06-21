@@ -91,8 +91,8 @@ class BluetoothView extends StatelessWidget {
                                     itemBuilder: (context, index) {
                                       return ListTile(
                                         title: Text(
-                                          controller
-                                              .connectedDevices[index].name,
+                                          controller.connectedDevices[index]
+                                              .platformName,
                                           style: const TextStyle(
                                               fontFamily: 'Montserrat',
                                               fontSize: 16,

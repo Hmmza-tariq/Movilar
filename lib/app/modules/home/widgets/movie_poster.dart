@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
+import 'package:movilar/app/modules/widgets/custom_image.dart';
 import 'package:movilar/app/resources/color_manager.dart';
 import 'package:movilar/app/routes/app_pages.dart';
 
@@ -22,11 +23,10 @@ class MoviePoster extends StatelessWidget {
             padding: const EdgeInsets.only(right: 6.0, left: 12, bottom: 24.0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                movie.image,
+              child: CustomImage(
+                image: movie.image,
                 width: 140,
                 height: 210,
-                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -35,7 +35,11 @@ class MoviePoster extends StatelessWidget {
           bottom: 0,
           left: 0,
           child: Container(
-            width: index > 8 ? 100 : 60,
+            width: index > 18
+                ? 130
+                : index > 8
+                    ? 100
+                    : 60,
             height: 140,
             decoration: BoxDecoration(
               color: Colors.transparent,

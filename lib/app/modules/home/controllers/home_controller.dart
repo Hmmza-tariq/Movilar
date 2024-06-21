@@ -1,153 +1,27 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
 import 'package:movilar/app/modules/mqtt/controllers/mqtt_listener.dart';
-import 'package:movilar/app/modules/mqtt/controllers/mqtt_publisher.dart';
-import 'package:movilar/app/resources/assets_manager.dart';
+import 'package:http/http.dart' as http;
 
 class HomeController extends GetxController {
   var movies = <Movie>[].obs;
+  var nowPlaying = <Movie>[].obs;
+  var popular = <Movie>[].obs;
+  var topRated = <Movie>[].obs;
+  var upcoming = <Movie>[].obs;
   var selectedTabIndex = 0.obs;
+  var watchLaterMovies = <String>[].obs;
   var isLoading = false.obs;
 
+  final String apiKey = '856fcb83ecb826025083d8982930bad9';
   @override
   void onInit() {
     super.onInit();
     Get.put(MQTTListener());
-    movies.value = [
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d1,
-          image: AssetsManager.d1,
-          ratings: "9.8",
-          id: "1"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d2,
-          image: AssetsManager.d2,
-          ratings: "9.8",
-          id: "2"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about:
-              "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d7,
-          image: AssetsManager.d3,
-          ratings: "9.8",
-          id: "3"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d4,
-          image: AssetsManager.d4,
-          ratings: "9.8",
-          id: "4"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d5,
-          image: AssetsManager.d5,
-          ratings: "9.8",
-          id: "5"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d6,
-          image: AssetsManager.d6,
-          ratings: "9.8",
-          id: "6"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d7,
-          image: AssetsManager.d7,
-          ratings: "9.8",
-          id: "7"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d7,
-          image: AssetsManager.d7,
-          ratings: "9.8",
-          id: "8"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d7,
-          image: AssetsManager.d7,
-          ratings: "9.8",
-          id: "7"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d7,
-          image: AssetsManager.d7,
-          ratings: "9.8",
-          id: "8"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d7,
-          image: AssetsManager.d7,
-          ratings: "9.8",
-          id: "7"),
-      Movie(
-          title: "Spiderman No Way Home",
-          about: "From DC Comics",
-          year: "2019",
-          duration: "139",
-          genre: "action",
-          trailer: "abc.com",
-          banner: AssetsManager.d7,
-          image: AssetsManager.d7,
-          ratings: "9.8",
-          id: "8"),
-    ];
+    fetchMovies();
   }
 
   void changeTabIndex(int index) {
@@ -170,15 +44,82 @@ class HomeController extends GetxController {
     return result;
   }
 
-  List<Movie> getWatchListMovies() {
-    var result = movies.where((movie) => movie.isWatchListed!).toList();
-    return result;
-  }
-
   Future<void> fetchMovies() async {
     isLoading.value = true;
-    await Future.delayed(const Duration(seconds: 2));
-    movies.value = movies.reversed.toList();
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.themoviedb.org/3/movie/upcoming?api_key=$apiKey'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        movies.value = (data['results'] as List)
+            .map((movie) => Movie.fromJson(movie))
+            .toList();
+      } else {
+        Get.snackbar('Error', 'Failed to fetch movies');
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      Get.snackbar('Error', 'Failed to fetch movies');
+    }
+    await Future.wait([
+      fetchNowPlayingMovies(),
+      fetchPopularMovies(),
+      fetchTopRatedMovies(),
+      fetchUpcomingMovies(),
+    ]);
+
     isLoading.value = false;
+  }
+
+  Future<void> fetchNowPlayingMovies() async {
+    final response = await http.get(Uri.parse(
+        'https://api.themoviedb.org/3/movie/now_playing?api_key=$apiKey'));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      nowPlaying.value = (data['results'] as List)
+          .map((movie) => Movie.fromJson(movie))
+          .toList();
+    } else {
+      Get.snackbar('Error', 'Failed to fetch Now Playing movies');
+    }
+  }
+
+  Future<void> fetchPopularMovies() async {
+    final response = await http.get(Uri.parse(
+        'https://api.themoviedb.org/3/movie/popular?api_key=$apiKey'));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      popular.value = (data['results'] as List)
+          .map((movie) => Movie.fromJson(movie))
+          .toList();
+    } else {
+      Get.snackbar('Error', 'Failed to fetch Popular movies');
+    }
+  }
+
+  Future<void> fetchTopRatedMovies() async {
+    final response = await http.get(Uri.parse(
+        'https://api.themoviedb.org/3/movie/top_rated?api_key=$apiKey'));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      topRated.value = (data['results'] as List)
+          .map((movie) => Movie.fromJson(movie))
+          .toList();
+    } else {
+      Get.snackbar('Error', 'Failed to fetch Top Rated movies');
+    }
+  }
+
+  Future<void> fetchUpcomingMovies() async {
+    final response = await http.get(Uri.parse(
+        'https://api.themoviedb.org/3/movie/upcoming?api_key=$apiKey'));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      upcoming.value = (data['results'] as List)
+          .map((movie) => Movie.fromJson(movie))
+          .toList();
+    } else {
+      Get.snackbar('Error', 'Failed to fetch Upcoming movies');
+    }
   }
 }

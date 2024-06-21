@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
+import 'package:movilar/app/modules/widgets/custom_image.dart';
 import 'package:movilar/app/modules/widgets/icon_text_widget.dart';
 import 'package:movilar/app/resources/assets_manager.dart';
 import 'package:movilar/app/resources/color_manager.dart';
@@ -23,11 +24,10 @@ class MovieDetailItem extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(12)),
-              child: Image.asset(
-                movie.image,
+              child: CustomImage(
+                image: movie.image,
                 width: 95,
                 height: 120,
-                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(width: 8),

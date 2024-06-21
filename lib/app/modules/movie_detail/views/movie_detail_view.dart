@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/modules/widgets/custom_app_bar.dart';
+import 'package:movilar/app/modules/widgets/custom_image.dart';
 import 'package:movilar/app/modules/widgets/icon_text_widget.dart';
 import 'package:movilar/app/resources/assets_manager.dart';
 import 'package:movilar/app/resources/color_manager.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../controllers/movie_detail_controller.dart';
 
 class MovieDetailView extends GetView<MovieDetailController> {
@@ -35,11 +37,10 @@ class MovieDetailView extends GetView<MovieDetailController> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(bottom: 70),
-                        child: Image.asset(
-                          controller.movie.value.banner,
+                        child: CustomImage(
+                          image: controller.movie.value.banner,
                           width: double.infinity,
                           height: Get.height * .3,
-                          fit: BoxFit.cover,
                         ),
                       ),
                       Positioned(
@@ -78,11 +79,10 @@ class MovieDetailView extends GetView<MovieDetailController> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(
-                                controller.movie.value.image,
+                              child: CustomImage(
+                                image: controller.movie.value.image,
                                 width: 100,
                                 height: 150,
-                                fit: BoxFit.cover,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -176,14 +176,53 @@ class MovieDetailView extends GetView<MovieDetailController> {
                                 ),
                               ),
                             ),
-                            const Center(
-                              child: Text(
-                                'Trailer goes here',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: ColorManager.white,
-                                ),
-                              ),
+                            Center(
+                              child: Container(
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 20),
+                                  width: Get.width * .8,
+                                  height: 300,
+                                  decoration: BoxDecoration(
+                                    color: ColorManager.lightGrey,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.play_circle_outline_outlined,
+                                      color: ColorManager.darkGrey,
+                                      size: 50,
+                                    ),
+                                    onPressed: () {
+                                      YoutubePlayerController videoController =
+                                          YoutubePlayerController(
+                                        initialVideoId:
+                                            YoutubePlayer.convertUrlToId(
+                                                    controller
+                                                        .trailerUrl.value) ??
+                                                "",
+                                        flags: const YoutubePlayerFlags(
+                                          autoPlay: true,
+                                          mute: false,
+                                        ),
+                                      );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => YoutubePlayer(
+                                            controller: videoController,
+                                            showVideoProgressIndicator: true,
+                                            progressIndicatorColor:
+                                                ColorManager.blue,
+                                            progressColors:
+                                                const ProgressBarColors(
+                                              playedColor: ColorManager.blue,
+                                              handleColor: ColorManager.blue,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  )),
                             ),
                           ],
                         ),

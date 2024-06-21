@@ -20,7 +20,7 @@ class IconTextWidget extends StatelessWidget {
             colorFilter: ColorFilter.mode(color, BlendMode.srcIn), width: 16),
         const SizedBox(width: 4),
         Text(
-          text[0].toUpperCase() + text.substring(1),
+          text,
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,

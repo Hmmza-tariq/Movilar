@@ -11,43 +11,36 @@ class Movie {
   final String trailer;
   bool? isWatchListed;
 
-  Movie(
-      {required this.title,
-      required this.about,
-      required this.year,
-      required this.duration,
-      required this.genre,
-      required this.trailer,
-      required this.banner,
-      required this.image,
-      required this.ratings,
-      required this.id,
-      this.isWatchListed = false});
+  Movie({
+    required this.id,
+    required this.title,
+    required this.banner,
+    required this.image,
+    required this.about,
+    required this.year,
+    required this.duration,
+    required this.ratings,
+    required this.genre,
+    required this.trailer,
+    this.isWatchListed = false,
+  });
 
-  Movie.fromJson(Map<String, dynamic> json)
-      : title = json['title'],
-        banner = json['banner'],
-        image = json['image'],
-        about = json['about'],
-        year = json['year'],
-        duration = json['duration'],
-        ratings = json['ratings'],
-        genre = json['genre'],
-        id = json['id'],
-        trailer = json['trailer'],
-        isWatchListed = json['isWatchListed'] ?? false;
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'banner': banner,
-        'image': image,
-        'about': about,
-        'year': year,
-        'duration': duration,
-        'ratings': ratings,
-        'genre': genre,
-        'trailer': trailer,
-        'isWatchListed': isWatchListed,
-      };
+  factory Movie.fromJson(Map<String, dynamic> json) {
+    return Movie(
+      id: json['id'].toString(),
+      title: json['title'] ?? '',
+      banner: json['poster_path'] != null
+          ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}'
+          : "",
+      image: json['backdrop_path'] != null
+          ? 'https://image.tmdb.org/t/p/w500${json['backdrop_path']}'
+          : "",
+      about: json['overview'] ?? '',
+      year: json['release_date']?.substring(0, 4) ?? '',
+      duration: '', // Duration is not available in this API endpoint
+      ratings: json['vote_average'].toStringAsFixed(1),
+      genre: '', // Genre is not available in this API endpoint
+      trailer: '', // Trailer is not available in this API endpoint
+    );
+  }
 }

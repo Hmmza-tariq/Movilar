@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -46,7 +48,7 @@ class HomeView extends GetView<HomeController> {
                             const Text(
                               "What do you want to watch?",
                               style: TextStyle(
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: ColorManager.white,
                               ),
@@ -168,16 +170,16 @@ class HomeView extends GetView<HomeController> {
                                   children: [
                                     MovieCategoryView(
                                         category: 'Now playing',
-                                        movies: controller.movies.value),
+                                        movies: controller.nowPlaying.value),
                                     MovieCategoryView(
                                         category: 'Upcoming',
-                                        movies: controller.movies.value),
+                                        movies: controller.upcoming.value),
                                     MovieCategoryView(
                                         category: 'Top rated',
-                                        movies: controller.movies.value),
+                                        movies: controller.topRated.value),
                                     MovieCategoryView(
                                         category: 'Popular',
-                                        movies: controller.movies.value),
+                                        movies: controller.popular.value),
                                   ],
                                 )),
                           ),
