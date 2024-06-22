@@ -196,10 +196,7 @@ class MovieDetailView extends GetView<MovieDetailController> {
                                       YoutubePlayerController videoController =
                                           YoutubePlayerController(
                                         initialVideoId:
-                                            YoutubePlayer.convertUrlToId(
-                                                    controller
-                                                        .trailerUrl.value) ??
-                                                "",
+                                            controller.trailerUrl.value,
                                         flags: const YoutubePlayerFlags(
                                           autoPlay: true,
                                           mute: false,

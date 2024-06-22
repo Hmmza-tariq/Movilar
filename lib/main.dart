@@ -4,13 +4,15 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'package:get/get.dart';
 import 'package:movilar/app/resources/theme_manager.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:movilar/app/services/internet_service.dart';
 import 'app/routes/app_pages.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterBluePlus.setLogLevel(LogLevel.info, color: false);
-
+  await dotenv.load();
+  await Get.put(InternetService()).checkInternet();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,

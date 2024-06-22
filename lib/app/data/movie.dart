@@ -1,14 +1,14 @@
 class Movie {
   final String id;
-  final String title;
-  final String banner;
-  final String image;
-  final String about;
-  final String year;
-  final String duration;
-  final String ratings;
-  final String genre;
-  final String trailer;
+  String title;
+  String banner;
+  String image;
+  String about;
+  String year;
+  String duration;
+  String ratings;
+  String genre;
+  String trailer;
   bool? isWatchListed;
 
   Movie({
@@ -37,10 +37,10 @@ class Movie {
           : "",
       about: json['overview'] ?? '',
       year: json['release_date']?.substring(0, 4) ?? '',
-      duration: '', // Duration is not available in this API endpoint
+      duration: '0 min',
       ratings: json['vote_average'].toStringAsFixed(1),
-      genre: '', // Genre is not available in this API endpoint
-      trailer: '', // Trailer is not available in this API endpoint
+      genre: 'genre',
+      trailer: '',
     );
   }
 }

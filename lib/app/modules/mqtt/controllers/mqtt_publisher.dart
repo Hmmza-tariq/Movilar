@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/modules/widgets/loading.dart';
 import 'package:mqtt_client/mqtt_client.dart';
@@ -7,7 +8,8 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 class MQTTPublisher extends GetxController {
   MqttServerClient? client;
   var identifier = "publisher".toString();
-  var host = "test.mosquitto.org".obs;
+  final String host = dotenv.env['HOST'] ?? '';
+  final int port = int.parse(dotenv.env['PORT'].toString());
 
   @override
   void onInit() {
@@ -22,8 +24,8 @@ class MQTTPublisher extends GetxController {
   }
 
   void initializeMQTTClient() {
-    client = MqttServerClient(host.value, identifier);
-    client!.port = 1883;
+    client = MqttServerClient(host, identifier);
+    client!.port = port;
     client!.keepAlivePeriod = 20;
     client!.onDisconnected = onDisconnected;
     client!.secure = false;

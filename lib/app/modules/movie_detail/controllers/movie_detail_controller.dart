@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
 import 'package:movilar/app/modules/home/controllers/home_controller.dart';
 import 'package:movilar/app/modules/watchlist/controllers/watchlist_controller.dart';
-import 'package:http/http.dart' as http;
+import 'package:movilar/app/services/movie_service.dart';
 
 class MovieDetailController extends GetxController {
   var movie = Movie(
@@ -19,8 +17,8 @@ class MovieDetailController extends GetxController {
           ratings: "ratings",
           id: "")
       .obs;
-  final String apiKey = '856fcb83ecb826025083d8982930bad9';
   var trailerUrl = ''.obs;
+  final MovieService _movieService = MovieService();
 
   @override
   void onInit() {
@@ -29,18 +27,10 @@ class MovieDetailController extends GetxController {
     super.onInit();
   }
 
-  void getDetails() async {
-    final response = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/${movie.value.id}/videos?api_key=$apiKey'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['results'].isNotEmpty) {
-        trailerUrl.value =
-            'https://www.youtube.com/watch?v=${data['results'][0]['key']}';
-      }
-    } else {
-      Get.snackbar('Error', 'Failed to fetch Now Playing movies');
-    }
+  Future<void> getDetails() async {
+    trailerUrl.value =
+        await _movieService.getTrailer(movie.value.id, trailerUrl.value) ?? '';
+    movie.value = await _movieService.getDetails(movie.value.id) ?? movie.value;
   }
 
   void toggleWatchList() {

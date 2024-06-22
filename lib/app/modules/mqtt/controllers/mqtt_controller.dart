@@ -1,8 +1,9 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/modules/mqtt/controllers/mqtt_manager.dart';
 import 'package:movilar/app/modules/widgets/loading.dart';
+import 'package:movilar/app/services/internet_service.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'dart:math';
@@ -10,23 +11,26 @@ import 'dart:math';
 class MqttController extends GetxController {
   var isConnected = false.obs;
   var isSubscribed = false.obs;
-  var internetConnected = false.obs;
   var message = <String>[].obs;
+  final String host = dotenv.env['HOST'] ?? '';
+  final int port = int.parse(dotenv.env['PORT'].toString());
 
   final MQTTAppState currentState = Get.put(MQTTAppState());
   MqttServerClient? client;
   var identifier = String.fromCharCodes(
       List.generate(5, (index) => Random().nextInt(33) + 89));
-  var host = "test.mosquitto.org".obs;
 
   TextEditingController messageController = TextEditingController();
   TextEditingController topicController =
       TextEditingController(text: "cowlar/movie-task");
 
+  final InternetService internetService = Get.find<InternetService>();
+
   @override
   void onInit() {
     super.onInit();
-    checkInternet();
+    internetService.checkInternet();
+    internetService.listenInternet();
     initializeMQTTClient();
   }
 
@@ -36,21 +40,9 @@ class MqttController extends GetxController {
     super.onClose();
   }
 
-  Future<void> checkInternet() async {
-    Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
-      if (result.contains(ConnectivityResult.none)) {
-        internetConnected.value = false;
-      } else {
-        internetConnected.value = true;
-      }
-    });
-  }
-
   void initializeMQTTClient() {
-    client = MqttServerClient(host.value, identifier);
-    client!.port = 1883;
+    client = MqttServerClient(host, identifier);
+    client!.port = port;
     client!.keepAlivePeriod = 20;
     client!.onDisconnected = onDisconnected;
     client!.secure = false;

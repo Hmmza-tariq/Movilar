@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/modules/widgets/custom_app_bar.dart';
 import 'package:movilar/app/modules/widgets/custom_elevated_button.dart';
+import 'package:movilar/app/modules/widgets/no_internet_dialog.dart';
 import 'package:movilar/app/resources/color_manager.dart';
 import '../controllers/mqtt_controller.dart';
 
@@ -213,52 +214,10 @@ class MqttView extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (!controller.internetConnected.value) ...[
-                  Container(
-                    height: Get.height * 0.8,
-                    width: Get.width,
-                    color: ColorManager.transparent,
-                    alignment: Alignment.center,
-                    child: Container(
-                      height: Get.height * 0.25,
-                      width: Get.width * 0.5,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: ColorManager.darkGrey,
-                          width: 2,
-                        ),
-                        color: ColorManager.lightGrey.withAlpha(230),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.wifi_off,
-                            color: ColorManager.red,
-                            size: 50,
-                          ),
-                          const Text(
-                            "Internet Not Connected",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                color: ColorManager.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                controller.checkInternet();
-                              },
-                              icon: const Icon(Icons.refresh,
-                                  color: ColorManager.blue, size: 30))
-                        ],
-                      ),
-                    ),
-                  )
-                ]
+                if (!controller.internetService.internetConnected.value)
+                  noInternetDialog(() {
+                    controller.internetService.checkInternet();
+                  })
               ],
             ),
           ),

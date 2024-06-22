@@ -1,12 +1,9 @@
-import 'dart:convert';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
 import 'package:movilar/app/modules/mqtt/controllers/mqtt_listener.dart';
-import 'package:http/http.dart' as http;
 import 'package:movilar/app/modules/widgets/no_internet_dialog.dart';
-import 'package:movilar/app/resources/color_manager.dart';
+import 'package:movilar/app/services/internet_service.dart';
+import 'package:movilar/app/services/movie_service.dart';
 
 class HomeController extends GetxController {
   var movies = <Movie>[].obs;
@@ -17,27 +14,18 @@ class HomeController extends GetxController {
   var selectedTabIndex = 0.obs;
   var watchLaterMovies = <String>[].obs;
   var isLoading = false.obs;
-  var internetConnected = false.obs;
 
-  final String apiKey = '856fcb83ecb826025083d8982930bad9';
+  final MovieService _movieService = MovieService();
+  final InternetService internetService = Get.find<InternetService>();
+
   @override
   void onInit() {
     super.onInit();
-    Get.put(MQTTListener());
+    internetService.listenInternet();
+    if (internetService.internetConnected.value) {
+      Get.put(MQTTListener());
+    }
     fetchMovies();
-  }
-
-  Future<void> checkInternet() async {
-    Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
-      if (result.contains(ConnectivityResult.none)) {
-        internetConnected.value = false;
-        noInternetDialog();
-      } else {
-        internetConnected.value = true;
-      }
-    });
   }
 
   void changeTabIndex(int index) {
@@ -61,85 +49,26 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchMovies() async {
-    await checkInternet();
-    if (!internetConnected.value) {
+    await internetService.checkInternet();
+
+    // print('Internet: ${internetConnected.value}');
+    if (!internetService.internetConnected.value) {
+      await Get.dialog(noInternetDialog(() {
+        Get.back();
+      }));
       return;
     }
+
     isLoading.value = true;
     try {
-      final response = await http.get(Uri.parse(
-          'https://api.themoviedb.org/3/movie/upcoming?api_key=$apiKey'));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        movies.value = (data['results'] as List)
-            .map((movie) => Movie.fromJson(movie))
-            .toList();
-      } else {
-        Get.snackbar('Error', 'Failed to fetch movies');
-      }
+      movies.value = await _movieService.fetchMovies('upcoming');
+      nowPlaying.value = await _movieService.fetchMovies('now_playing');
+      popular.value = await _movieService.fetchMovies('popular');
+      topRated.value = await _movieService.fetchMovies('top_rated');
+      upcoming.value = await _movieService.fetchMovies('upcoming');
     } catch (e) {
-      debugPrint(e.toString());
-      Get.snackbar('Error', 'Failed to fetch movies');
+      Get.snackbar('Error', e.toString());
     }
-    await Future.wait([
-      fetchNowPlayingMovies(),
-      fetchPopularMovies(),
-      fetchTopRatedMovies(),
-      fetchUpcomingMovies(),
-    ]);
-
     isLoading.value = false;
-  }
-
-  Future<void> fetchNowPlayingMovies() async {
-    final response = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/now_playing?api_key=$apiKey'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      nowPlaying.value = (data['results'] as List)
-          .map((movie) => Movie.fromJson(movie))
-          .toList();
-    } else {
-      Get.snackbar('Error', 'Failed to fetch Now Playing movies');
-    }
-  }
-
-  Future<void> fetchPopularMovies() async {
-    final response = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/popular?api_key=$apiKey'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      popular.value = (data['results'] as List)
-          .map((movie) => Movie.fromJson(movie))
-          .toList();
-    } else {
-      Get.snackbar('Error', 'Failed to fetch Popular movies');
-    }
-  }
-
-  Future<void> fetchTopRatedMovies() async {
-    final response = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/top_rated?api_key=$apiKey'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      topRated.value = (data['results'] as List)
-          .map((movie) => Movie.fromJson(movie))
-          .toList();
-    } else {
-      Get.snackbar('Error', 'Failed to fetch Top Rated movies');
-    }
-  }
-
-  Future<void> fetchUpcomingMovies() async {
-    final response = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/upcoming?api_key=$apiKey'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      upcoming.value = (data['results'] as List)
-          .map((movie) => Movie.fromJson(movie))
-          .toList();
-    } else {
-      Get.snackbar('Error', 'Failed to fetch Upcoming movies');
-    }
   }
 }

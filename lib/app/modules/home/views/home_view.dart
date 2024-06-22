@@ -10,6 +10,7 @@ import 'package:movilar/app/modules/mqtt/controllers/mqtt_publisher.dart';
 import 'package:movilar/app/modules/mqtt/views/mqtt_view.dart';
 import 'package:movilar/app/modules/searches/views/searches_view.dart';
 import 'package:movilar/app/modules/watchlist/views/watchlist_view.dart';
+import 'package:movilar/app/modules/widgets/no_internet_dialog.dart';
 import 'package:movilar/app/resources/assets_manager.dart';
 import 'package:movilar/app/resources/color_manager.dart';
 import '../controllers/home_controller.dart';
@@ -61,10 +62,16 @@ class HomeView extends GetView<HomeController> {
                                 color: ColorManager.white,
                               ),
                               onPressed: () async {
-                                await controller.checkInternet();
-
-                                if (controller.internetConnected.value) {
+                                await controller.internetService
+                                    .listenInternet();
+                                ();
+                                if (controller
+                                    .internetService.internetConnected.value) {
                                   mqttPublisher.refreshPressed();
+                                } else {
+                                  await Get.dialog(noInternetDialog(() {
+                                    Get.back();
+                                  }));
                                 }
                               },
                             ),
@@ -169,7 +176,7 @@ class HomeView extends GetView<HomeController> {
                             ],
                           ),
                           SizedBox(
-                            height: Get.height * .35,
+                            height: Get.height * .32,
                             child: Obx(() => TabBarView(
                                   children: [
                                     MovieCategoryView(

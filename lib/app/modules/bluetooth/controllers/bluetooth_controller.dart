@@ -56,6 +56,7 @@ class BluetoothController extends GetxController {
 
   void turnOFF() async {
     if (Platform.isAndroid) {
+      // ignore: deprecated_member_use
       await FlutterBluePlus.turnOff();
     }
   }
