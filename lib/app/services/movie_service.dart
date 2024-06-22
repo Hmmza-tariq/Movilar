@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
 import 'package:movilar/app/helpers/database_helper.dart';
 
@@ -45,10 +45,10 @@ class MovieService {
         final movie = Movie.fromJson(detailData);
         return movie;
       } else {
-        Get.snackbar('Error', 'Failed to fetch movie details');
+        debugPrint('ERROR: Failed to fetch movie details');
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      debugPrint(e.toString());
     }
     return null;
   }
@@ -63,10 +63,10 @@ class MovieService {
           return data['results'][0]['key'];
         }
       } else {
-        Get.snackbar('Error', 'Failed to fetch trailer data');
+        debugPrint('ERROR: Failed to fetch trailer');
       }
     } catch (e) {
-      Get.snackbar('Error', "Internet connection error. Please try again.");
+      debugPrint(e.toString());
     }
     return null;
   }

@@ -43,7 +43,7 @@ class WatchlistView extends StatelessWidget {
                         }
                         if (controller.watchlist.isEmpty) {
                           return SizedBox(
-                            height: Get.height * .8,
+                            height: Get.height * .7,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.max,

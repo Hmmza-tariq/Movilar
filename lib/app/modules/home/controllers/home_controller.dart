@@ -77,21 +77,18 @@ class HomeController extends GetxController {
     isLoading.value = true;
     try {
       var fetchedMovies = await _movieService.fetchMovies('upcoming');
-      movies.value = fetchedMovies;
-
       var fetchedNowPlaying = await _movieService.fetchMovies('now_playing');
-      nowPlaying.value = fetchedNowPlaying;
-
       var fetchedPopular = await _movieService.fetchMovies('popular');
-      popular.value = fetchedPopular;
-
       var fetchedTopRated = await _movieService.fetchMovies('top_rated');
-      topRated.value = fetchedTopRated;
-
       var fetchedUpcoming = await _movieService.fetchMovies('upcoming');
-      upcoming.value = fetchedUpcoming;
 
       isLoading.value = false;
+
+      movies.value = fetchedMovies;
+      nowPlaying.value = fetchedNowPlaying;
+      popular.value = fetchedPopular;
+      topRated.value = fetchedTopRated;
+      upcoming.value = fetchedUpcoming;
 
       await _dbHelper.deleteMovies('movies');
       await _dbHelper.deleteMovies('now_playing');
@@ -115,8 +112,8 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       debugPrint(e.toString());
-      Get.snackbar('Error', e.toString());
+      isLoading.value = false;
+      // Get.snackbar('Error', e.toString());
     }
-    isLoading.value = false;
   }
 }
