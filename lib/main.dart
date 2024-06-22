@@ -11,7 +11,7 @@ import 'app/routes/app_pages.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterBluePlus.setLogLevel(LogLevel.info, color: false);
-  await dotenv.load();
+  await dotenv.load(fileName: ".env");
   await Get.put(InternetService()).checkInternet();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

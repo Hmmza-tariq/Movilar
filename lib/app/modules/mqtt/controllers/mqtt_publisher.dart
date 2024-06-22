@@ -29,7 +29,7 @@ class MQTTPublisher extends GetxController {
     client!.keepAlivePeriod = 20;
     client!.onDisconnected = onDisconnected;
     client!.secure = false;
-    client!.logging(on: true);
+    client!.logging(on: false);
 
     client!.onConnected = onConnected;
     client!.onSubscribed = onSubscribed;

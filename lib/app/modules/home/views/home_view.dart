@@ -10,6 +10,7 @@ import 'package:movilar/app/modules/mqtt/controllers/mqtt_publisher.dart';
 import 'package:movilar/app/modules/mqtt/views/mqtt_view.dart';
 import 'package:movilar/app/modules/searches/views/searches_view.dart';
 import 'package:movilar/app/modules/watchlist/views/watchlist_view.dart';
+import 'package:movilar/app/modules/widgets/custom_shimmer.dart';
 import 'package:movilar/app/modules/widgets/no_internet_dialog.dart';
 import 'package:movilar/app/resources/assets_manager.dart';
 import 'package:movilar/app/resources/color_manager.dart';
@@ -64,7 +65,6 @@ class HomeView extends GetView<HomeController> {
                               onPressed: () async {
                                 await controller.internetService
                                     .listenInternet();
-                                ();
                                 if (controller
                                     .internetService.internetConnected.value) {
                                   mqttPublisher.refreshPressed();
@@ -126,9 +126,21 @@ class HomeView extends GetView<HomeController> {
                   const SizedBox(height: 16),
                   Obx(() {
                     if (controller.isLoading.value) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return SizedBox(
+                          height: Get.height * .3,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 6,
+                            itemBuilder: (context, index) {
+                              return const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: CustomShimmer(
+                                  width: 180,
+                                  height: 210,
+                                ),
+                              );
+                            },
+                          ));
                     } else {
                       return SizedBox(
                         height: Get.height * .3,
@@ -176,23 +188,42 @@ class HomeView extends GetView<HomeController> {
                             ],
                           ),
                           SizedBox(
-                            height: Get.height * .32,
-                            child: Obx(() => TabBarView(
-                                  children: [
-                                    MovieCategoryView(
-                                        category: 'Now playing',
-                                        movies: controller.nowPlaying.value),
-                                    MovieCategoryView(
-                                        category: 'Upcoming',
-                                        movies: controller.upcoming.value),
-                                    MovieCategoryView(
-                                        category: 'Top rated',
-                                        movies: controller.topRated.value),
-                                    MovieCategoryView(
-                                        category: 'Popular',
-                                        movies: controller.popular.value),
-                                  ],
-                                )),
+                            height: Get.height * .33,
+                            child: Obx(() => (controller.isLoading.value)
+                                ? SizedBox(
+                                    height: Get.height * .33,
+                                    child: GridView.builder(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                              childAspectRatio: .8,
+                                              crossAxisCount: 3),
+                                      itemCount: 9,
+                                      itemBuilder: (context, index) {
+                                        return const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: CustomShimmer(
+                                            width: 200.0,
+                                            height: 100.0,
+                                          ),
+                                        );
+                                      },
+                                    ))
+                                : TabBarView(
+                                    children: [
+                                      MovieCategoryView(
+                                          category: 'Now playing',
+                                          movies: controller.nowPlaying.value),
+                                      MovieCategoryView(
+                                          category: 'Upcoming',
+                                          movies: controller.upcoming.value),
+                                      MovieCategoryView(
+                                          category: 'Top rated',
+                                          movies: controller.topRated.value),
+                                      MovieCategoryView(
+                                          category: 'Popular',
+                                          movies: controller.popular.value),
+                                    ],
+                                  )),
                           ),
                         ],
                       ),

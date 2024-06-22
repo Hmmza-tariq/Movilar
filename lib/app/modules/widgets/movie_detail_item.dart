@@ -38,15 +38,18 @@ class MovieDetailItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Text(
-                    movie.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: ColorManager.white,
+                  SizedBox(
+                    width: Get.width - 150,
+                    child: Text(
+                      movie.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: ColorManager.white,
+                      ),
                     ),
                   ),
                   // const SizedBox(height: 32),

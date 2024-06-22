@@ -1,23 +1,33 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
+import 'package:movilar/app/helpers/database_helper.dart';
 
 class MovieService {
   final Dio _dio = Dio();
   final String apiKey = dotenv.env['API_KEY'] ?? '';
   final String baseURL = dotenv.env['BASE_URL'] ?? '';
+  final DatabaseHelper _dbHelper = DatabaseHelper();
 
   Future<List<Movie>> fetchMovies(String endpoint) async {
     try {
       final response =
           await _dio.get('$baseURL/movie/$endpoint?api_key=$apiKey');
       if (response.statusCode == 200) {
-        final data = json.decode(response.data);
-        return (data['results'] as List)
-            .map((movie) => Movie.fromJson(movie))
+        final data = response.data;
+        var temp = (data['results'] as List)
+            .map((movie) => Movie.fromJson(movie).id)
             .toList();
+        List<Movie> result = [];
+        for (var id in temp) {
+          final movie = await getDetails(id);
+          if (movie != null) {
+            result.add(movie);
+            await _dbHelper.insertMovie(movie, endpoint);
+          }
+        }
+        return result;
       } else {
         throw Exception('Failed to fetch movies');
       }
@@ -56,7 +66,7 @@ class MovieService {
         Get.snackbar('Error', 'Failed to fetch trailer data');
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      Get.snackbar('Error', "Internet connection error. Please try again.");
     }
     return null;
   }

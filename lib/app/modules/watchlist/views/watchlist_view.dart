@@ -30,6 +30,17 @@ class WatchlistView extends StatelessWidget {
                           ? 1
                           : controller.watchlist.length,
                       itemBuilder: (context, index) {
+                        if (controller.isLoading.value == true) {
+                          return SizedBox(
+                            height: Get.height * .6,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    ColorManager.white),
+                              ),
+                            ),
+                          );
+                        }
                         if (controller.watchlist.isEmpty) {
                           return SizedBox(
                             height: Get.height * .8,

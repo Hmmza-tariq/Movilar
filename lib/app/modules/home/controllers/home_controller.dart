@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
+import 'package:movilar/app/helpers/database_helper.dart';
 import 'package:movilar/app/modules/mqtt/controllers/mqtt_listener.dart';
+import 'package:movilar/app/modules/watchlist/controllers/watchlist_controller.dart';
 import 'package:movilar/app/modules/widgets/no_internet_dialog.dart';
 import 'package:movilar/app/services/internet_service.dart';
 import 'package:movilar/app/services/movie_service.dart';
@@ -12,19 +15,27 @@ class HomeController extends GetxController {
   var topRated = <Movie>[].obs;
   var upcoming = <Movie>[].obs;
   var selectedTabIndex = 0.obs;
-  var watchLaterMovies = <String>[].obs;
-  var isLoading = false.obs;
+  var isLoading = true.obs;
 
   final MovieService _movieService = MovieService();
   final InternetService internetService = Get.find<InternetService>();
-
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+  var categories = [
+    'movies',
+    'now_playing',
+    'popular',
+    'top_rated',
+    'upcoming',
+  ];
   @override
   void onInit() {
     super.onInit();
+
     internetService.listenInternet();
-    if (internetService.internetConnected.value) {
+    Get.put(WatchlistController());
+    internetService.internetConnected.listen((val) {
       Get.put(MQTTListener());
-    }
+    });
     fetchMovies();
   }
 
@@ -50,9 +61,13 @@ class HomeController extends GetxController {
 
   Future<void> fetchMovies() async {
     await internetService.checkInternet();
-
-    // print('Internet: ${internetConnected.value}');
     if (!internetService.internetConnected.value) {
+      movies.value = await _dbHelper.getMovies("movies");
+      nowPlaying.value = await _dbHelper.getMovies("now_playing");
+      popular.value = await _dbHelper.getMovies("popular");
+      topRated.value = await _dbHelper.getMovies("top_rated");
+      upcoming.value = await _dbHelper.getMovies("upcoming");
+      isLoading.value = false;
       await Get.dialog(noInternetDialog(() {
         Get.back();
       }));
@@ -61,12 +76,45 @@ class HomeController extends GetxController {
 
     isLoading.value = true;
     try {
-      movies.value = await _movieService.fetchMovies('upcoming');
-      nowPlaying.value = await _movieService.fetchMovies('now_playing');
-      popular.value = await _movieService.fetchMovies('popular');
-      topRated.value = await _movieService.fetchMovies('top_rated');
-      upcoming.value = await _movieService.fetchMovies('upcoming');
+      var fetchedMovies = await _movieService.fetchMovies('upcoming');
+      movies.value = fetchedMovies;
+
+      var fetchedNowPlaying = await _movieService.fetchMovies('now_playing');
+      nowPlaying.value = fetchedNowPlaying;
+
+      var fetchedPopular = await _movieService.fetchMovies('popular');
+      popular.value = fetchedPopular;
+
+      var fetchedTopRated = await _movieService.fetchMovies('top_rated');
+      topRated.value = fetchedTopRated;
+
+      var fetchedUpcoming = await _movieService.fetchMovies('upcoming');
+      upcoming.value = fetchedUpcoming;
+
+      isLoading.value = false;
+
+      await _dbHelper.deleteMovies('movies');
+      await _dbHelper.deleteMovies('now_playing');
+      await _dbHelper.deleteMovies('popular');
+      await _dbHelper.deleteMovies('top_rated');
+      await _dbHelper.deleteMovies('upcoming');
+      for (var movie in fetchedMovies) {
+        await _dbHelper.insertMovie(movie, "movies");
+      }
+      for (var movie in fetchedNowPlaying) {
+        await _dbHelper.insertMovie(movie, "now_playing");
+      }
+      for (var movie in fetchedPopular) {
+        await _dbHelper.insertMovie(movie, "popular");
+      }
+      for (var movie in fetchedTopRated) {
+        await _dbHelper.insertMovie(movie, "top_rated");
+      }
+      for (var movie in fetchedUpcoming) {
+        await _dbHelper.insertMovie(movie, "upcoming");
+      }
     } catch (e) {
+      debugPrint(e.toString());
       Get.snackbar('Error', e.toString());
     }
     isLoading.value = false;

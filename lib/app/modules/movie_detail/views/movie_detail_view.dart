@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:movilar/app/modules/widgets/custom_app_bar.dart';
 import 'package:movilar/app/modules/widgets/custom_image.dart';
 import 'package:movilar/app/modules/widgets/icon_text_widget.dart';
+import 'package:movilar/app/modules/widgets/no_internet_dialog.dart';
 import 'package:movilar/app/resources/assets_manager.dart';
 import 'package:movilar/app/resources/color_manager.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -22,7 +23,7 @@ class MovieDetailView extends GetView<MovieDetailController> {
               onPressedBack: () {
                 Get.back();
               },
-              icon: controller.movie.value.isWatchListed == true
+              icon: controller.isWatchListed.value == true
                   ? Icons.bookmark
                   : Icons.bookmark_border,
               onPressedIcon: () {
@@ -60,7 +61,7 @@ class MovieDetailView extends GetView<MovieDetailController> {
                                   width: 20),
                               const SizedBox(width: 4),
                               Text(
-                                controller.movie.value.ratings.toString(),
+                                controller.movie.value.ratings.substring(0, 3),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   color: ColorManager.white,
@@ -193,6 +194,14 @@ class MovieDetailView extends GetView<MovieDetailController> {
                                       size: 50,
                                     ),
                                     onPressed: () {
+                                      if (controller.internetService
+                                              .internetConnected.value ==
+                                          false) {
+                                        Get.dialog(noInternetDialog(() {
+                                          Get.back();
+                                        }));
+                                        return;
+                                      }
                                       YoutubePlayerController videoController =
                                           YoutubePlayerController(
                                         initialVideoId:
