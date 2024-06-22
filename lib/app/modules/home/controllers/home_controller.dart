@@ -1,10 +1,12 @@
 import 'dart:convert';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
 import 'package:movilar/app/modules/mqtt/controllers/mqtt_listener.dart';
 import 'package:http/http.dart' as http;
+import 'package:movilar/app/modules/widgets/no_internet_dialog.dart';
+import 'package:movilar/app/resources/color_manager.dart';
 
 class HomeController extends GetxController {
   var movies = <Movie>[].obs;
@@ -15,6 +17,7 @@ class HomeController extends GetxController {
   var selectedTabIndex = 0.obs;
   var watchLaterMovies = <String>[].obs;
   var isLoading = false.obs;
+  var internetConnected = false.obs;
 
   final String apiKey = '856fcb83ecb826025083d8982930bad9';
   @override
@@ -22,6 +25,19 @@ class HomeController extends GetxController {
     super.onInit();
     Get.put(MQTTListener());
     fetchMovies();
+  }
+
+  Future<void> checkInternet() async {
+    Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      if (result.contains(ConnectivityResult.none)) {
+        internetConnected.value = false;
+        noInternetDialog();
+      } else {
+        internetConnected.value = true;
+      }
+    });
   }
 
   void changeTabIndex(int index) {
@@ -45,6 +61,10 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchMovies() async {
+    await checkInternet();
+    if (!internetConnected.value) {
+      return;
+    }
     isLoading.value = true;
     try {
       final response = await http.get(Uri.parse(

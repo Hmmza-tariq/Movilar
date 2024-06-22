@@ -60,8 +60,12 @@ class HomeView extends GetView<HomeController> {
                                 size: 24,
                                 color: ColorManager.white,
                               ),
-                              onPressed: () {
-                                mqttPublisher.refreshPressed();
+                              onPressed: () async {
+                                await controller.checkInternet();
+
+                                if (controller.internetConnected.value) {
+                                  mqttPublisher.refreshPressed();
+                                }
                               },
                             ),
                           ],

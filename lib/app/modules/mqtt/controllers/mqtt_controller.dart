@@ -5,6 +5,7 @@ import 'package:movilar/app/modules/mqtt/controllers/mqtt_manager.dart';
 import 'package:movilar/app/modules/widgets/loading.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+import 'dart:math';
 
 class MqttController extends GetxController {
   var isConnected = false.obs;
@@ -14,7 +15,8 @@ class MqttController extends GetxController {
 
   final MQTTAppState currentState = Get.put(MQTTAppState());
   MqttServerClient? client;
-  var identifier = "huwaie".toString();
+  var identifier = String.fromCharCodes(
+      List.generate(5, (index) => Random().nextInt(33) + 89));
   var host = "test.mosquitto.org".obs;
 
   TextEditingController messageController = TextEditingController();
