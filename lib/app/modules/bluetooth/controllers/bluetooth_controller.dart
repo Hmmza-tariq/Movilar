@@ -22,12 +22,6 @@ class BluetoothController extends GetxController {
       debugPrint("Bluetooth permission granted");
     } else {
       debugPrint("Bluetooth permission denied");
-      // Get.snackbar(
-      //   "Bluetooth permission",
-      //   "Bluetooth permission is required to use this feature",
-      //   backgroundColor: Colors.red,
-      //   colorText: Colors.white,
-      // );
     }
   }
 
