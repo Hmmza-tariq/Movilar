@@ -5,7 +5,7 @@ import 'package:movilar/app/data/movie.dart';
 import 'package:movilar/app/helpers/database_helper.dart';
 
 class MovieService {
-  final Dio _dio = Dio();
+  Dio dio = Dio();
   final String apiKey = dotenv.env['API_KEY'] ?? '';
   final String baseURL = dotenv.env['BASE_URL'] ?? '';
   final DatabaseHelper _dbHelper = DatabaseHelper();
@@ -13,7 +13,7 @@ class MovieService {
   Future<List<Movie>> fetchMovies(String endpoint) async {
     try {
       final response =
-          await _dio.get('$baseURL/movie/$endpoint?api_key=$apiKey');
+          await dio.get('$baseURL/movie/$endpoint?api_key=$apiKey');
       if (response.statusCode == 200) {
         final data = response.data;
         var temp = (data['results'] as List)
@@ -39,7 +39,7 @@ class MovieService {
   Future<Movie?> getDetails(String id) async {
     try {
       final detailResponse =
-          await _dio.get('$baseURL/movie/$id?api_key=$apiKey');
+          await dio.get('$baseURL/movie/$id?api_key=$apiKey');
       if (detailResponse.statusCode == 200) {
         final detailData = detailResponse.data;
         final movie = Movie.fromJson(detailData);
@@ -48,7 +48,7 @@ class MovieService {
         debugPrint('ERROR: Failed to fetch movie details');
       }
     } catch (e) {
-      debugPrint(e.toString());
+      // debugPrint(e.toString());
     }
     return null;
   }
@@ -56,7 +56,7 @@ class MovieService {
   Future<String?> getTrailer(String id, String trailerUrl) async {
     try {
       final response =
-          await _dio.get('$baseURL/movie/$id/videos?api_key=$apiKey');
+          await dio.get('$baseURL/movie/$id/videos?api_key=$apiKey');
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['results'].isNotEmpty) {
@@ -66,7 +66,7 @@ class MovieService {
         debugPrint('ERROR: Failed to fetch trailer');
       }
     } catch (e) {
-      debugPrint(e.toString());
+      // debugPrint(e.toString());
     }
     return null;
   }

@@ -41,19 +41,13 @@ class MovieDetailController extends GetxController {
         await _movieService.getTrailer(movie.value.id, trailerUrl.value) ?? '';
   }
 
-  void toggleWatchList() {
+  Future<void> toggleWatchList() async {
     if (watchlistController.watchLaterMoviesIDs.contains(movie.value.id)) {
-      watchlistController.watchLaterMoviesIDs.remove(movie.value.id);
-      watchlistController.watchlist
-          .removeWhere((element) => element.id == movie.value.id);
-      movie.value.isWatchListed = false;
-      isWatchListed.value = false;
+      await watchlistController.removeFromWatchList(movie.value.id);
     } else {
-      watchlistController.watchLaterMoviesIDs.add(movie.value.id);
-      watchlistController.watchlist.add(movie.value);
-      movie.value.isWatchListed = true;
-      isWatchListed.value = true;
+      await watchlistController.addToWatchList(movie.value.id);
     }
+    isWatchListed.value = !isWatchListed.value;
     watchlistController.update();
   }
 }

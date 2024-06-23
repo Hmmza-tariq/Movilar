@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movilar/app/data/movie.dart';
 import 'package:movilar/app/helpers/database_helper.dart';
@@ -76,13 +75,19 @@ class HomeController extends GetxController {
 
     isLoading.value = true;
     try {
+      movies.value = await _dbHelper.getMovies("movies");
+      nowPlaying.value = await _dbHelper.getMovies("now_playing");
+      popular.value = await _dbHelper.getMovies("popular");
+      topRated.value = await _dbHelper.getMovies("top_rated");
+      upcoming.value = await _dbHelper.getMovies("upcoming");
+
+      isLoading.value = false;
+
       var fetchedMovies = await _movieService.fetchMovies('upcoming');
       var fetchedNowPlaying = await _movieService.fetchMovies('now_playing');
       var fetchedPopular = await _movieService.fetchMovies('popular');
       var fetchedTopRated = await _movieService.fetchMovies('top_rated');
       var fetchedUpcoming = await _movieService.fetchMovies('upcoming');
-
-      isLoading.value = false;
 
       movies.value = fetchedMovies;
       nowPlaying.value = fetchedNowPlaying;
@@ -111,9 +116,8 @@ class HomeController extends GetxController {
         await _dbHelper.insertMovie(movie, "upcoming");
       }
     } catch (e) {
-      debugPrint(e.toString());
+      // debugPrint(e.toString());
       isLoading.value = false;
-      // Get.snackbar('Error', e.toString());
     }
   }
 }
