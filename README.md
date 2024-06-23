@@ -1,6 +1,4 @@
-Sure! Here's an enhanced version of the `README.md` file for your `movilar` project:
 
----
 
 # Movilar
 
@@ -8,7 +6,7 @@ Movilar is a Flutter application designed to provide a comprehensive movie brows
 
 ## Recordings
 
-For detailed walkthroughs and demonstrations, please refer to the [Google Drive Recordings](https://drive.google.com/drive/folders/1oD8erBRLnQ-btdcEH9LNIxvbURteVDiE?usp=drive_link).
+All android (10,14), iOS and code demonstration recordings are available here: [Google Drive Recordings](https://drive.google.com/drive/folders/1oD8erBRLnQ-btdcEH9LNIxvbURteVDiE?usp=drive_link).
 
 ## Version
 
