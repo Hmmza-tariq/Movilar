@@ -1,7 +1,12 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  FlutterSecureStorage _storage;
+
+  SecureStorageService({FlutterSecureStorage? storage})
+      : _storage = storage ?? const FlutterSecureStorage();
+
+  set storage(FlutterSecureStorage storage) => _storage = storage;
 
   Future<void> writeWatchlist(String key, List<String> movieIds) async {
     await _storage.write(key: key, value: movieIds.join(','));

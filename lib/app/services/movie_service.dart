@@ -8,7 +8,7 @@ class MovieService {
   Dio dio = Dio();
   final String apiKey = dotenv.env['API_KEY'] ?? '';
   final String baseURL = dotenv.env['BASE_URL'] ?? '';
-  final DatabaseHelper _dbHelper = DatabaseHelper();
+  DatabaseHelper dbHelper = DatabaseHelper();
 
   Future<List<Movie>> fetchMovies(String endpoint) async {
     try {
@@ -24,7 +24,7 @@ class MovieService {
           final movie = await getDetails(id);
           if (movie != null) {
             result.add(movie);
-            await _dbHelper.insertMovie(movie, endpoint);
+            await dbHelper.insertMovie(movie, endpoint);
           }
         }
         return result;
