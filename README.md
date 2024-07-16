@@ -4,6 +4,16 @@
 
 Movilar is a Flutter application designed to provide a comprehensive movie browsing experience. The app leverages various packages to enhance its functionality, including secure storage, Dio, MQTT, Bluetooth integration, and more.
 
+## Screenshots
+
+ <img src="images\banners\movilar_banner.png">
+
+||||
+|--------------|--------------|--------------|
+| ![Screenshot 1](assets/images/(1).png) | ![Screenshot 2](assets/images/(2).png) | ![Screenshot 3](assets/images/(3).png) | 
+| ![Screenshot 1](assets/images/(4).png) | ![Screenshot 2](assets/images/(5).png) | ![Screenshot 3](assets/images/(6).png) | 
+
+
 ## Recordings
 
 All android (10,14), iOS and code demonstration recordings are available here: [Google Drive Recordings](https://drive.google.com/drive/folders/1oD8erBRLnQ-btdcEH9LNIxvbURteVDiE?usp=drive_link).
