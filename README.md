@@ -6,7 +6,7 @@ Movilar is a Flutter application designed to provide a comprehensive movie brows
 
 ## Screenshots
 
- <img src="assetes/images/movilar_banner.png">
+ <img src="assets/images/movilar_banner.png">
 
 ||||
 |--------------|--------------|--------------|
